@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
 //    graph.resize(300, 300);
 //    graph.show();
     MainWindow mainWin;
+    mainWin.resize(300, 300);
     mainWin.show();
 
     return app.exec();

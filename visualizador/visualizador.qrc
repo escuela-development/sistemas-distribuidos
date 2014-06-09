@@ -1,13 +1,17 @@
 <RCC>
-<qresource>
-    <file>images/icon.png</file>
-    <file>images/new.png</file>
-    <file>images/open.png</file>
-    <file>images/save.png</file>
-    <file>images/cut.png</file>
-    <file>images/copy.png</file>
-    <file>images/paste.png</file>
-    <file>images/find.png</file>
-    <file>images/gotocell.png</file>
-</qresource>
+    <qresource prefix="/">
+        <file>images/icon.png</file>
+        <file>images/new.png</file>
+        <file>images/open.png</file>
+        <file>images/save.png</file>
+        <file>images/cut.png</file>
+        <file>images/copy.png</file>
+        <file>images/paste.png</file>
+        <file>images/find.png</file>
+        <file>images/gotocell.png</file>
+        <file>images/next-icon-32.png</file>
+        <file>images/pause-icon-32.png</file>
+        <file>images/play-icon-32.png</file>
+        <file>images/stop-icon-32.png</file>
+    </qresource>
 </RCC>

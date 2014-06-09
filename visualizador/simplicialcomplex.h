@@ -15,6 +15,11 @@ public:
 
     bool readFile(const QString &fileName);
 
+public slots:
+    void animate();
+    void reset();
+    void setCommunicationType(const QString& text);
+
 protected:
     void initializeGL();
     void resizeGL(int width, int height);
@@ -28,6 +33,7 @@ private:
     int faceAtPosition(const QPoint &pos);
     void processline(std::string line);
     void printGraphData();
+    void tick(int amount);
 
     GLfloat rotationX;
     GLfloat rotationY;
@@ -36,6 +42,10 @@ private:
     QPoint lastPos;
 
     Graph *graph;
+
+    int elapsedTime;
+    int communicationType;
+    const int TICK_AMOUNT;
 
 };
 

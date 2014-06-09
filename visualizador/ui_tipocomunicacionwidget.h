@@ -17,6 +17,7 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -24,7 +25,7 @@ QT_BEGIN_NAMESPACE
 class Ui_TipoComunicacionWidget
 {
 public:
-    QWidget *widget;
+    QVBoxLayout *verticalLayout;
     QGridLayout *gridLayout;
     QLabel *label;
     QComboBox *tipoComunicacion;
@@ -33,22 +34,23 @@ public:
     {
         if (TipoComunicacionWidget->objectName().isEmpty())
             TipoComunicacionWidget->setObjectName(QStringLiteral("TipoComunicacionWidget"));
-        TipoComunicacionWidget->resize(400, 300);
-        widget = new QWidget(TipoComunicacionWidget);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(30, 30, 227, 31));
-        gridLayout = new QGridLayout(widget);
+        TipoComunicacionWidget->resize(233, 49);
+        verticalLayout = new QVBoxLayout(TipoComunicacionWidget);
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        gridLayout = new QGridLayout();
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        gridLayout->setContentsMargins(0, 0, 0, 0);
-        label = new QLabel(widget);
+        label = new QLabel(TipoComunicacionWidget);
         label->setObjectName(QStringLiteral("label"));
 
         gridLayout->addWidget(label, 0, 0, 1, 1);
 
-        tipoComunicacion = new QComboBox(widget);
+        tipoComunicacion = new QComboBox(TipoComunicacionWidget);
         tipoComunicacion->setObjectName(QStringLiteral("tipoComunicacion"));
 
         gridLayout->addWidget(tipoComunicacion, 0, 1, 1, 1);
+
+
+        verticalLayout->addLayout(gridLayout);
 
 #ifndef QT_NO_SHORTCUT
         label->setBuddy(tipoComunicacion);

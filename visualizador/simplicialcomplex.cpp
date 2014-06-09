@@ -1,6 +1,7 @@
 #include <QtGui>
 #include <QtOpenGL>
 #include <QDebug>
+#include <QTimer>
 #include "GL/glu.h"
 
 #include <iostream>
@@ -13,9 +14,12 @@
 #include "vertex2d.h"
 
 SimplicialComplex::SimplicialComplex(QWidget *parent)
-    : QGLWidget(parent)
+    : QGLWidget(parent),
+      TICK_AMOUNT(5)
 {
     setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
+
+    communicationType = 0;
 
     rotationX = -21.0;
     rotationY = -57.0;
@@ -25,7 +29,11 @@ SimplicialComplex::SimplicialComplex(QWidget *parent)
     faceColors[2] = Qt::blue;
     faceColors[3] = Qt::yellow;
 
-    graph = new Graph();
+    QSize size = QSize(500, 500);
+    setMinimumSize(size);
+
+    elapsedTime = 0;
+    graph = new Graph();        
 }
 
 SimplicialComplex::~SimplicialComplex()
@@ -53,6 +61,7 @@ void SimplicialComplex::resizeGL(int width, int height)
 
 void SimplicialComplex::paintGL()
 {
+//    qDebug() << "paintGL()";
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     draw();
 }
@@ -97,6 +106,9 @@ void SimplicialComplex::draw()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+//    qDebug() << elapsedTime;
+    glRotatef(elapsedTime, 0, 0, 1);
+
     // draw graph conntents
     glLineWidth(2.5f);
     glColor3f(1.0f, 0.5f, 0.0f);
@@ -111,8 +123,28 @@ void SimplicialComplex::draw()
                        vertices.at(i).getY());
         }
     }
+
     glEnd();
 
+}
+
+void SimplicialComplex::animate()
+{
+    tick(TICK_AMOUNT);
+    updateGL();
+}
+
+void SimplicialComplex::reset()
+{
+    elapsedTime = 0;
+    updateGL();
+}
+
+void SimplicialComplex::tick(int amount)
+{
+    if (elapsedTime > 360)
+        elapsedTime = 0;
+    elapsedTime += amount;
 }
 
 int SimplicialComplex::faceAtPosition(const QPoint &pos)
@@ -213,4 +245,15 @@ void SimplicialComplex::printGraphData()
         qDebug() << vertices.at(i).getX() << ", " << vertices.at(i).getY();
     }
 
+}
+
+void SimplicialComplex::setCommunicationType(const QString &text)
+{
+    qDebug() << "setCommunicationType";
+    qDebug() << text;
+
+    if (text == "confiable")
+        communicationType = 0;
+    else
+        communicationType = 1;
 }

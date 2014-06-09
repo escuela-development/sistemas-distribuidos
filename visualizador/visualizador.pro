@@ -2,18 +2,26 @@ HEADERS += \
     graph.h \
     vertex2d.h \
     mainwindow.h \
-    simplicialcomplex.h
+    simplicialcomplex.h \
+    tipocomunicacionwidget.h \
+    ui_tipocomunicacionwidget.h \
+    optionswidget.h
 
 SOURCES += \
     graph.cpp \
     vertex2d.cpp \
     mainwindow.cpp \
     simplicialcomplex.cpp \
-    main.cpp
+    main.cpp \
+    tipocomunicacionwidget.cpp \
+    optionswidget.cpp
 
-QT += opengl
+QT += opengl gui widgets
 
 unix|win32: LIBS += -lGLU
 
 RESOURCES += \
     visualizador.qrc
+
+FORMS += \
+    tipocomunicacionwidget.ui

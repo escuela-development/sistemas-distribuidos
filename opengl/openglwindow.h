@@ -65,6 +65,7 @@ public:
 public slots:
     void renderLater();
     void renderNow();
+    void open();
 
 protected:
     bool event(QEvent *event);
@@ -74,6 +75,15 @@ protected:
 private:
     bool m_update_pending;
     bool m_animating;
+
+    void createActions();
+    void createMenus();
+    bool loadFile(const QString &fileName);
+    bool okToContinue();
+
+    QMenu *fileMenu;
+    QAction *openAction;
+
 
     QOpenGLContext *m_context;
     QOpenGLPaintDevice *m_device;

@@ -1,3 +1,4 @@
+#include <sstream>
 #include "vertex2d.h"
 
 Vertex2d::Vertex2d()
@@ -30,4 +31,18 @@ double Vertex2d::getY()
 void Vertex2d::setY(double y)
 {
     this->y = y;
+}
+
+const char* Vertex2d::c_str()
+{
+    std::ostringstream out;
+    out << "[" << x << "," << y << "]";
+
+    return out.str().c_str();
+}
+
+std::ostream &operator<<(std::ostream &salida, const Vertex2d &v)
+{
+    salida << "[" << v.x << "," << v.y << "]";
+    return salida;
 }

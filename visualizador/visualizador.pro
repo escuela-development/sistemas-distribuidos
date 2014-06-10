@@ -5,7 +5,8 @@ HEADERS += \
     simplicialcomplex.h \
     tipocomunicacionwidget.h \
     ui_tipocomunicacionwidget.h \
-    optionswidget.h
+    optionswidget.h \
+    Utils.h
 
 SOURCES += \
     graph.cpp \

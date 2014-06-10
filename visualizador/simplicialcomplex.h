@@ -2,8 +2,11 @@
 #define SIMPLICIALCOMPLEX_H
 
 #include<QGLWidget>
+#include<vector>
 
 #include "graph.h"
+#include "vertex2d.h"
+
 
 class SimplicialComplex : public QGLWidget
 {
@@ -32,8 +35,13 @@ private:
     void draw();
     int faceAtPosition(const QPoint &pos);
     void processline(std::string line);
+    void alternateColor(int index);
     void printGraphData();
     void tick(int amount);
+    void communicateProcesses();
+    std::vector<Vertex2d> communicateWithFails(Vertex2d &process1, Vertex2d &process2);
+    std::vector<Vertex2d> communicate(Vertex2d &process1, Vertex2d &process2);
+
 
     GLfloat rotationX;
     GLfloat rotationY;
@@ -42,10 +50,14 @@ private:
     QPoint lastPos;
 
     Graph *graph;
+    Graph originalGraph;
 
+    bool toggleColor;
     int elapsedTime;
     int communicationType;
     const int TICK_AMOUNT;
+    const int CONFIABLE;
+    const int NO_CONFIABLE;
 
 };
 

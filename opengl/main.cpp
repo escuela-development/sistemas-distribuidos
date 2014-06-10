@@ -46,6 +46,7 @@
 #include <QtGui/QScreen>
 
 #include <QtCore/qmath.h>
+#include "SimplicialComplex.h"
 
 /*
 * Proyecto final sistemas distribuidos.
@@ -81,17 +82,30 @@ TriangleWindow::TriangleWindow()
 //! [2]
 int main(int argc, char **argv)
 {
-    QGuiApplication app(argc, argv);
+//    QGuiApplication app(argc, argv);
 
-    QSurfaceFormat format;
-    format.setSamples(16);
+//    QSurfaceFormat format;
+//    format.setSamples(16);
 
-    TriangleWindow window;
-    window.setFormat(format);
-    window.resize(640, 480);
-    window.show();
+//    TriangleWindow window;
+//    window.setFormat(format);
+//    window.resize(640, 480);
+//    window.show();
 
-    window.setAnimating(true);
+//    window.setAnimating(true);
+
+//    return app.exec();
+    QApplication app(argc, argv);
+
+    if (!QLFormat::hasOpenGL()) {
+        std::cerr << "This system has no OpenGL support" << std::endl;
+        return 1;
+    }
+
+    SimplicialComplex graph;
+    graph.setWindowTitle(QObject::tr("SimplicialComplex"));
+    graph.resize(300, 300);
+    graph.show();
 
     return app.exec();
 }

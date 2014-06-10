@@ -27,6 +27,7 @@ private slots:
     void open();
     void startAnimation();
     void stopAnimation();
+    void pauseAnimation();
     void stepAnimation();
     void updateActions();
 

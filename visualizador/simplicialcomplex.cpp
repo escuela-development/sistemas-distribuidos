@@ -9,16 +9,22 @@
 #include <cstddef>
 #include <fstream>
 #include <string>
+#include <cstdlib>
+#include <algorithm>
 
 #include "simplicialcomplex.h"
 #include "vertex2d.h"
+#include "Utils.h"
 
 SimplicialComplex::SimplicialComplex(QWidget *parent)
     : QGLWidget(parent),
-      TICK_AMOUNT(5)
+      TICK_AMOUNT(5),
+      CONFIABLE(0),
+      NO_CONFIABLE(1)
 {
     setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
 
+    toggleColor = false;
     communicationType = 0;
 
     rotationX = -21.0;
@@ -43,7 +49,7 @@ SimplicialComplex::~SimplicialComplex()
 
 void SimplicialComplex::initializeGL()
 {
-    qglClearColor(Qt::white);
+    qglClearColor(Qt::gray);
     glShadeModel(GL_FLAT);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -102,25 +108,24 @@ void SimplicialComplex::paintGL()
 
 void SimplicialComplex::draw()
 {
-
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-//    qDebug() << elapsedTime;
-    glRotatef(elapsedTime, 0, 0, 1);
+//    glRotatef(elapsedTime, 0, 0, 1);
 
     // draw graph conntents
-    glLineWidth(2.5f);
-    glColor3f(1.0f, 0.5f, 0.0f);
-    glBegin(GL_LINE_LOOP);
+    glLineWidth(2.5f);   
+    glBegin(GL_LINES);
     {
         std::vector<Vertex2d> vertices = graph->getVertices();
 
-        for (unsigned i = 0; i < vertices.size(); i++) {
-//            std::cout << vertices.at(i).getX() << " "
-//                      << vertices.at(i).getY() << std::endl;
-            glVertex2d(vertices.at(i).getX(),
-                       vertices.at(i).getY());
+        for (unsigned i = 1; i < vertices.size(); i += 2) {
+            alternateColor(i);
+
+            glVertex2d(vertices[i-1].getX(),
+                       vertices[i-1].getY());
+            glVertex2d(vertices[i].getX(),
+                       vertices[i].getY());
         }
     }
 
@@ -128,15 +133,114 @@ void SimplicialComplex::draw()
 
 }
 
+void SimplicialComplex::alternateColor(int index)
+{
+    toggleColor = !toggleColor;
+
+    if (toggleColor)
+        glColor3f(1.0f, 1.0f, 1.0f);
+    else
+        glColor3f(0.0f, 0.0f, 0.0f);
+}
+
+void SimplicialComplex::communicateProcesses()
+{
+    std::vector<Vertex2d> vertices = graph->getVertices();    
+
+    graph->clear();
+    std::vector<Vertex2d> newVertexSet;
+
+    for (unsigned i = 1; i < vertices.size(); i++) {
+
+        if (communicationType == CONFIABLE) {
+            newVertexSet = communicate(vertices[i - 1], vertices[i]);
+        }
+        if (communicationType == NO_CONFIABLE) {
+            newVertexSet = communicateWithFails(vertices[i - 1], vertices[i]);
+        }
+
+        graph->addAll(newVertexSet);
+    }
+
+    // remove adjacents copys with the same value
+    vertices = graph->getVertices();
+
+    std::vector<Vertex2d>::iterator it;
+    it = std::unique(vertices.begin(),
+                     vertices.end(),
+                     predicateCompareVertex2d);
+    vertices.resize(std::distance(vertices.begin(), it));
+    graph->clear();
+    graph->addAll(vertices);
+
+}
+
+std::vector<Vertex2d> SimplicialComplex::communicate(Vertex2d &process1, Vertex2d &process2)
+{
+    double amountDivisionX = (process2.getX() - process1.getX()) / (double) 4;
+    double amountDivisionY = (process2.getY() - process1.getY()) / (double) 4;
+
+    Vertex2d vertex_1 = Vertex2d(process1.getX() + amountDivisionX,
+                                  process1.getY() + amountDivisionY);
+    Vertex2d vertex_2 = Vertex2d(process1.getX() + 2*amountDivisionX,
+                                  process1.getY() + 2*amountDivisionY);
+
+    std::vector<Vertex2d> vertices;
+
+    qDebug() << "communicate - vertices generados";
+    qDebug() << vertex_1.c_str();
+    qDebug() << vertex_2.c_str();
+
+    vertices.push_back(vertex_1);
+    vertices.push_back(vertex_2);
+
+    return vertices;
+}
+
+std::vector<Vertex2d> SimplicialComplex::communicateWithFails(Vertex2d &process1, Vertex2d &process2)
+{
+    double amountDivisionX = (process2.getX() - process1.getX()) / (double) 4;
+    double amountDivisionY = (process2.getY() - process1.getY()) / (double) 4;
+
+
+    Vertex2d vertex_1 = Vertex2d(process1.getX() + amountDivisionX,
+                                  process1.getY() + amountDivisionY);
+    Vertex2d vertex_2 = Vertex2d(process1.getX() + 2*amountDivisionX,
+                                  process1.getY() + 2*amountDivisionY);
+
+    std::vector<Vertex2d> vertices;
+
+    qDebug() << "communicateWithFails - vertices generados";
+    qDebug() << process1.c_str();
+    qDebug() << vertex_1.c_str();
+    qDebug() << vertex_2.c_str();
+    qDebug() << process2.c_str();
+
+
+    vertices.push_back(process1);
+    vertices.push_back(vertex_1);
+    vertices.push_back(vertex_2);
+    vertices.push_back(process2);
+
+    return vertices;
+
+}
+
 void SimplicialComplex::animate()
 {
     tick(TICK_AMOUNT);
+    communicateProcesses();
+
+    qDebug() << "Graph vertex";
+    qDebug() << graph->c_str();
+
     updateGL();
 }
 
 void SimplicialComplex::reset()
 {
     elapsedTime = 0;
+    *graph = originalGraph;
     updateGL();
 }
 
@@ -181,23 +285,6 @@ int SimplicialComplex::faceAtPosition(const QPoint &pos)
 
 bool SimplicialComplex::readFile(const QString &fileName)
 {
-//    QFile file(fileName);
-//    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-//        QMessageBox::warning(this, tr("Visualizador"),
-//                             tr("Cannot read file %1: \n%2.")
-//                             .arg(file.fileName())
-//                             .arg(file.errorString()));
-//        return false;
-//    }
-
-//    QTextStream in(&file);
-
-//    QApplication::setOverrideCursor(Qt::WaitCursor);
-//    while(!in.atEnd()) {
-//        QString line = in.readLine();
-//        processline(line);
-//    }
-//    printGraphData();
     std::ifstream file(fileName.toStdString().c_str(), std::ios::in);
     if (!file) {
         std::cerr << "No fue posible leer el archivo " << fileName.toStdString() << std::endl;
@@ -209,7 +296,11 @@ bool SimplicialComplex::readFile(const QString &fileName)
         processline(line);
     }
 
-    printGraphData();
+//    printGraphData();
+
+    // save original graph data
+    originalGraph = graph->clone();
+
     draw();
 
     // update opengl
@@ -232,7 +323,7 @@ void SimplicialComplex::processline(std::string line)
     iss >> y;
 
     Vertex2d v = Vertex2d(x, y);
-    graph->addVertex(v);
+    graph->add(v);
 }
 
 void SimplicialComplex::printGraphData()

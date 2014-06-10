@@ -55,6 +55,8 @@ OpenGLWindow::OpenGLWindow(QWindow *parent)
     , m_device(0)
 {
     setSurfaceType(QWindow::OpenGLSurface);
+
+    createActions();
 }
 //! [1]
 
@@ -158,3 +160,38 @@ void OpenGLWindow::setAnimating(bool animating)
 }
 //! [5]
 
+void MainWindow::open()
+{
+    if (okToContinue()) {
+        QString fileName = QFileDialog::getOpenFileName(this,
+                              tr("Open model"), ".",
+                              tr("Simplicial complex files (*.sp)"));
+        if (!fileName.isEmpty())
+            loadFile(fileName);
+    }
+}
+
+void OpenGLWindow::createActions()
+{
+    openAction = new QAction(tr("&Open..."), this);
+    openAction->setIcon(QIcon(":/images/open.png"));
+    openAction->setShortcut(QKeySequence::Open);
+    openAction->setStatutsTip(tr("Open simplicial complex"));
+    connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
+}
+
+void OpenGLWindow::createMenus()
+{
+    fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(openAction);
+}
+
+bool OpenGLWindow::okToContinue()
+{
+    return true;
+}
+
+bool OpenGLWindow::loadFile(const QString &fileName)
+{
+    return true;
+}

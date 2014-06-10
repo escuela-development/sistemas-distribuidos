@@ -69,6 +69,10 @@ void MainWindow::createActions()
     pauseAction = new QAction(tr("&Pause"), this);
     pauseAction->setIcon(QIcon(":/images/pause-icon-32.png"));
     pauseAction->setStatusTip(tr("Pause animation"));
+    connect(pauseAction, SIGNAL(triggered()),
+            this, SLOT(pauseAnimation()));
+    connect(pauseAction, SIGNAL(triggered()),
+            this, SLOT(updateActions()));
 
     stepAction = new QAction(tr("&Step"), this);
     stepAction->setIcon(QIcon(tr(":/images/next-icon-32.png")));
@@ -99,23 +103,6 @@ void MainWindow::createToolBars()
 
 void MainWindow::createDockWindows()
 {
-//    QDockWidget *dock = new QDockWidget(tr("Customers"), this);
-//    dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-//    customerList = new QListWidget(dock);
-//    customerList->addItems(QStringList()
-//                           << "John Doe, Harmony"
-//                           << "Jane Doe");
-//    dock->setWidget(customerList);
-//    addDockWidget(Qt::RightDockWidgetArea, dock);
-
-//    QDockWidget *dock = new QDockWidget(tr("Comunicacion"), this);
-//    dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-//    dock->setObjectName("comunicacionDockWidget");
-
-//    tipoComunicacion = new TipoComunicacionWidget(dock);
-//    dock->setWidget(tipoComunicacion);
-//    addDockWidget(Qt::RightDockWidgetArea, dock);
-
     QDockWidget *dock = new QDockWidget(tr("Comunicacion"));
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     dock->setObjectName("communicationDock");
@@ -161,6 +148,12 @@ void MainWindow::startAnimation()
 }
 
 void MainWindow::stopAnimation()
+{
+    isAnimationActive = false;
+    timer->stop();
+}
+
+void MainWindow::pauseAnimation()
 {
     isAnimationActive = false;
     timer->stop();

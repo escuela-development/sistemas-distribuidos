@@ -6,7 +6,12 @@ HEADERS += \
     tipocomunicacionwidget.h \
     ui_tipocomunicacionwidget.h \
     optionswidget.h \
-    Utils.h
+    Utils.h \
+    vertex3d.h \
+    grafica.h \
+    edge.h \
+    complejosimplicial.h \
+    ventanaprincipal.h
 
 SOURCES += \
     graph.cpp \
@@ -15,7 +20,12 @@ SOURCES += \
     simplicialcomplex.cpp \
     main.cpp \
     tipocomunicacionwidget.cpp \
-    optionswidget.cpp
+    optionswidget.cpp \
+    vertex3d.cpp \
+    grafica.cpp \
+    edge.cpp \
+    complejosimplicial.cpp \
+    ventanaprincipal.cpp
 
 QT += opengl gui widgets
 

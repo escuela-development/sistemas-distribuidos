@@ -1,8 +1,9 @@
 #include <QApplication>
+
 #include <iostream>
 
-#include "mainwindow.h"
-#include "simplicialcomplex.h"
+#include "ventanaprincipal.h"
+#include "complejosimplicial.h"
 
 int main(int argc, char *argv[])
 {
@@ -17,7 +18,7 @@ int main(int argc, char *argv[])
 //    graph.setWindowTitle(QObject::tr("SimplicialComplex"));
 //    graph.resize(300, 300);
 //    graph.show();
-    MainWindow mainWin;
+    VentanaPrincipal mainWin;
     mainWin.resize(300, 300);
     mainWin.show();
 

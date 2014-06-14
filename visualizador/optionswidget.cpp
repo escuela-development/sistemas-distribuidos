@@ -1,5 +1,6 @@
 #include <QtWidgets>
 #include "optionswidget.h"
+#include "mecanismos_comunicacion.h"
 
 OptionsWidget::OptionsWidget(QWidget *parent)
     :QDialog(parent)
@@ -28,7 +29,7 @@ void OptionsWidget::communicationTypeChanged(int index)
     qDebug() << index;
     int selectedItem = communicationList->currentIndex();
     if (selectedItem == 0)
-        emit setCommunicationType("confiable");
+        emit setTipoComunicacion(STR_CONFIABLE_COLOREADA);
     else
-        emit setCommunicationType("no-confiable");
+        emit setTipoComunicacion(STR_NO_CONFIABLE_COLOREADA);
 }

@@ -1,3 +1,4 @@
+#include <iostream>
 #include "vertex3d.h"
 
 Vertex3d::Vertex3d(double x, double y, double z)
@@ -35,4 +36,11 @@ double Vertex3d::getZ()
 void Vertex3d::setZ(double z)
 {
     this->z = z;
+}
+
+std::ostream &operator<<(std::ostream &salida, const Vertex3d &v)
+{
+    salida << "[" << v.x << "," << v.y
+           << "," << v.z << "]";
+    return salida;
 }

@@ -1,3 +1,4 @@
+#include<vector>
 #include <algorithm>
 #include <iterator>
 
@@ -27,4 +28,10 @@ std::vector<Vertex3d> Grafica::getVertices()
 std::vector<Edge> Grafica::getAristas()
 {
     return _aristas;
+}
+
+void Grafica::limpiar()
+{
+    _vertices.clear();
+    _aristas.clear();
 }

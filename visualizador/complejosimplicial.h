@@ -20,22 +20,39 @@ public:
 
     bool leerArchivo(const QString &fileName);
 
-//public slots:
-//    void animate();
+public slots:
 //    void reset();
-//    void setCommunicationType(const QString& text);
+    void comunicarProcesos();
+    void setTipoComunicacion(const std::string tipoComunicacion);
 
 protected:
     void initializeGL();
     void resizeGL(int width, int height);
     void paintGL();
+    void keyPressEvent(QKeyEvent * event);
 
 private:
     void dibujar();
     void procesaLineaTexto(std::string cadena);
     Vertex3d leerVertice(std::string cadena);
     Edge leerArista(std::string cadena);
+    void incrementarAnguloGiroY(int delta);
+    void incrementarAnguloGiroX(int delta);
+
+    void dibujarVertice(Vertex3d vertice);
+    void dibujarArista(Edge arista);
+
+    void comunicarConfiableColoreada();
+    void comunicarNoConfiableColoreada();
+
+
     Grafica *grafica;
+    Grafica *graficaOriginal;
+
+    int anguloGiroY;
+    int anguloGiroX;
+
+    std::string tipoComunicacion;
 };
 
 #endif // COMPLEJOSIMPLICIAL_H

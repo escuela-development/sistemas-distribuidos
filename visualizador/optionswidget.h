@@ -22,7 +22,7 @@ public:
     OptionsWidget(QWidget *parent = 0);
 
 signals:
-    void setCommunicationType(const QString &Text);
+    void setTipoComunicacion(const std::string tipoComunicacion);
 
 private slots:
     void communicationTypeChanged(int index);

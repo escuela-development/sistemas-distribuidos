@@ -14,7 +14,7 @@
 
 #include "simplicialcomplex.h"
 #include "vertex2d.h"
-#include "Utils.h"
+
 
 SimplicialComplex::SimplicialComplex(QWidget *parent)
     : QGLWidget(parent),
@@ -166,9 +166,9 @@ void SimplicialComplex::communicateProcesses()
     vertices = graph->getVertices();
 
     std::vector<Vertex2d>::iterator it;
-    it = std::unique(vertices.begin(),
-                     vertices.end(),
-                     predicateCompareVertex2d);
+//    it = std::unique(vertices.begin(),
+//                     vertices.end(),
+//                     predicateCompareVertex2d);
     vertices.resize(std::distance(vertices.begin(), it));
     graph->clear();
     graph->addAll(vertices);

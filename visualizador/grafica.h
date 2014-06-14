@@ -15,6 +15,8 @@ public:
     std::vector<Vertex3d> getVertices();
     std::vector<Edge> getAristas();
 
+    void limpiar();
+
 private:
     std::vector<Vertex3d> _vertices;
     std::vector<Edge> _aristas;

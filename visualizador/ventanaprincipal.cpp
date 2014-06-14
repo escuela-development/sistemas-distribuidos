@@ -36,6 +36,12 @@ void VentanaPrincipal::crearActions()
     exitAction->setStatusTip(tr("Exit the application"));
     connect(exitAction, SIGNAL(triggered()),
             this, SLOT(close()));
+
+    stepAction = new QAction(tr("&Step"), this);
+    stepAction->setIcon(QIcon(tr(":/images/next-icon-32.png")));
+    stepAction->setStatusTip(tr("Comunicar procesos"));
+    connect(stepAction, SIGNAL(triggered()),
+            simplejo, SLOT(comunicarProcesos()));
 }
 
 void VentanaPrincipal::crearMenus()
@@ -48,7 +54,11 @@ void VentanaPrincipal::crearMenus()
 
 void VentanaPrincipal::crearToolBars()
 {
+    animationToolbar = new QToolBar(tr("Animate"));
+    animationToolbar->addAction(stepAction);
+    animationToolbar->setAllowedAreas(Qt::TopToolBarArea);
 
+    addToolBar(animationToolbar);
 }
 
 void VentanaPrincipal::crearDockWindows()

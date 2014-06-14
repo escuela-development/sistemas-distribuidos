@@ -1,8 +1,12 @@
 #ifndef EDGE_H
 #define EDGE_H
 
+#include <iostream>
+
 class Edge
 {
+    friend std::ostream &operator<<(std::ostream &, const Edge &);
+
 public:
     Edge(int v1, int v2);
     int getVertex1();

@@ -32,10 +32,12 @@ private:
 
     OptionsWidget *opciones;
     ComplejoSimplicial *simplejo;
+    QToolBar *animationToolbar;
 
     QMenu *fileMenu;
     QAction *openAction;
     QAction *exitAction;
+    QAction *stepAction;
 };
 
 #endif // VENTANAPRINCIPAL_H

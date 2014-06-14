@@ -11,7 +11,8 @@ HEADERS += \
     grafica.h \
     edge.h \
     complejosimplicial.h \
-    ventanaprincipal.h
+    ventanaprincipal.h \
+    mecanismos_comunicacion.h
 
 SOURCES += \
     graph.cpp \
@@ -25,7 +26,9 @@ SOURCES += \
     grafica.cpp \
     edge.cpp \
     complejosimplicial.cpp \
-    ventanaprincipal.cpp
+    ventanaprincipal.cpp \
+    mecanismos_comunicacion.cpp \
+    Utils.cpp
 
 QT += opengl gui widgets
 

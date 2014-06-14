@@ -1,8 +1,12 @@
 #ifndef VERTEX3D_H
 #define VERTEX3D_H
 
+#include <iostream>
+
 class Vertex3d
 {
+    friend std::ostream &operator<<(std::ostream &, const Vertex3d &);
+
 public:
     Vertex3d(double x, double y, double z);
     double getX();

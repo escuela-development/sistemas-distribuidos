@@ -26,7 +26,6 @@ OptionsWidget::OptionsWidget(QWidget *parent)
 
 void OptionsWidget::communicationTypeChanged(int index)
 {
-    qDebug() << index;
     int selectedItem = communicationList->currentIndex();
     if (selectedItem == 0)
         emit setTipoComunicacion(STR_CONFIABLE_COLOREADA);

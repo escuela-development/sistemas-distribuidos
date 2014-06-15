@@ -38,6 +38,7 @@ ComplejoSimplicial::ComplejoSimplicial(QWidget *parent)
 
     grafica = new Grafica;
     graficaOriginal = new Grafica;
+    graficaCopia = new Grafica;
 }
 
 ComplejoSimplicial::~ComplejoSimplicial()
@@ -86,9 +87,6 @@ void ComplejoSimplicial::dibujar()
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-
-    qDebug() << anguloGiroX;
-    qDebug() << anguloGiroY;
 
     glRotated(anguloGiroX,1,0,0);
     glRotated(anguloGiroY,0,1,0);
@@ -271,7 +269,7 @@ void ComplejoSimplicial::comunicarConfiableColoreada()
         index_vertex_1 = aristas[i].getVertex1();
         index_vertex_2 = aristas[i].getVertex2();
 
-        std::vector<Vertex3d> result = comunicarNoConfiableColoreado(vertices[index_vertex_1],
+        std::vector<Vertex3d> result = comunicarDeFormaColoreada(vertices[index_vertex_1],
                                                                      vertices[index_vertex_2]);
         std::copy(result.begin(), result.end(),
                   std::back_inserter(verticesGenerados));
@@ -312,7 +310,7 @@ void ComplejoSimplicial::comunicarNoConfiableColoreada()
         index_vertex_1 = aristas[i].getVertex1();
         index_vertex_2 = aristas[i].getVertex2();
 
-        std::vector<Vertex3d> result = comunicarNoConfiableColoreado(vertices[index_vertex_1],
+        std::vector<Vertex3d> result = comunicarDeFormaColoreada(vertices[index_vertex_1],
                                                                      vertices[index_vertex_2]);
         std::copy(result.begin(), result.end(),
                   std::back_inserter(verticesGenerados));
@@ -339,15 +337,21 @@ void ComplejoSimplicial::comunicarNoConfiableColoreada()
     grafica->addVertices(verticesGenerados);
     grafica->addAristas(aristasGeneradas);
 
-    qDebug() << "Vertices";
-    qDebug() << print(grafica->getVertices()).c_str();
-    qDebug() << "Aristas";
-    qDebug() << print(grafica->getAristas()).c_str();
+//    qDebug() << "Vertices";
+//    qDebug() << print(grafica->getVertices()).c_str();
+//    qDebug() << "Aristas";
+//    qDebug() << print(grafica->getAristas()).c_str();
 }
 
 void ComplejoSimplicial::comunicarProcesos()
 {
     qDebug() << tipoComunicacion.c_str();
+    int num_vertices = grafica->getVertices().size();
+    int num_aristas = grafica->getAristas().size();
+
+    qDebug() << "Numero vertices " << num_vertices;
+    qDebug() << "Numero aristas " << num_aristas;
+
 
     if (tipoComunicacion == STR_CONFIABLE_COLOREADA) {
         comunicarConfiableColoreada();
@@ -356,6 +360,13 @@ void ComplejoSimplicial::comunicarProcesos()
     if (tipoComunicacion == STR_NO_CONFIABLE_COLOREADA) {
         comunicarNoConfiableColoreada();
     }
+
+    num_vertices = grafica->getVertices().size();
+    num_aristas = grafica->getAristas().size();
+
+    qDebug() << "Numero vertices despues comunicacion " << num_vertices;
+    qDebug() << "Numero aristas despues comunicacion " << num_aristas;
+
 
     updateGL();
 }

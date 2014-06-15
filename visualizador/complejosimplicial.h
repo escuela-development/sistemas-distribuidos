@@ -49,6 +49,7 @@ private:
 
     Grafica *grafica;
     Grafica *graficaOriginal;
+    Grafica *graficaCopia;
 
     int anguloGiroY;
     int anguloGiroX;

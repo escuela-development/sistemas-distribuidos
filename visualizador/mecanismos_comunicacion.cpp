@@ -5,7 +5,7 @@
 #include "edge.h"
 
 
-std::vector<Vertex3d> comunicarNoConfiableColoreado(Vertex3d v1, Vertex3d v2)
+std::vector<Vertex3d> comunicarDeFormaColoreada(Vertex3d v1, Vertex3d v2)
 {
     double amount_division_x = (v2.getX() - v1.getX()) / (double) 4;
     double amount_division_y = (v2.getY() - v1.getY()) / (double) 4;

@@ -8,8 +8,10 @@ OptionsWidget::OptionsWidget(QWidget *parent)
     label = new QLabel(tr("&Tipo comunicacion"));
     communicationList = new QComboBox();
     communicationList->addItems(QStringList()
-                    << "Confiable"
-                    << "No confiable");
+                    << "Confiable coloreada"
+                    << "No confiable coloreada"
+                    << "Confiable no coloreada"
+                    << "No confiable no coloreada");
     label->setBuddy(communicationList);
 
     connect(communicationList, SIGNAL(activated(int)),
@@ -27,8 +29,25 @@ OptionsWidget::OptionsWidget(QWidget *parent)
 void OptionsWidget::communicationTypeChanged(int index)
 {
     int selectedItem = communicationList->currentIndex();
-    if (selectedItem == 0)
+
+    switch (selectedItem) {
+    case 0:
         emit setTipoComunicacion(STR_CONFIABLE_COLOREADA);
-    else
+        break;
+
+    case 1:
         emit setTipoComunicacion(STR_NO_CONFIABLE_COLOREADA);
+        break;
+
+    case 2:
+        emit setTipoComunicacion(STR_CONFIABLE_NO_COLOREADA);
+        break;
+
+    case 3:
+        emit setTipoComunicacion(STR_NO_CONFIABLE_NO_COLOREADA);
+        break;
+
+    default:
+        exit(1);
+    }
 }

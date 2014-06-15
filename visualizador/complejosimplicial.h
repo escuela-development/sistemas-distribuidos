@@ -45,6 +45,8 @@ private:
 
     void comunicarConfiableColoreada();
     void comunicarNoConfiableColoreada();
+    void comunicarConfiableNoColoreada();
+    void comunicarNoConfiableNoColoreada();
 
 
     Grafica *grafica;

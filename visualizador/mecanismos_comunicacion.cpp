@@ -27,3 +27,19 @@ std::vector<Vertex3d> comunicarDeFormaColoreada(Vertex3d v1, Vertex3d v2)
 
     return result;
 }
+
+std::vector<Vertex3d> comunicarDeFormaNoColoreada(Vertex3d v1, Vertex3d v2)
+{
+    double midpoint_x = (v1.getX() + v2.getX()) / (double) 2;
+    double midpoint_y = (v1.getY() + v2.getY()) / (double) 2;
+    double midpoint_z = (v1.getZ() + v2.getZ()) / (double) 2;
+
+    Vertex3d midpoint = Vertex3d(midpoint_x, midpoint_y, midpoint_z);
+
+    std::vector<Vertex3d> result;
+    result.push_back(v1);
+    result.push_back(midpoint);
+    result.push_back(v2);
+
+    return result;
+}

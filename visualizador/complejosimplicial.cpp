@@ -152,6 +152,8 @@ bool ComplejoSimplicial::leerArchivo(const QString &fileName)
             aristasLeidas.push_back(a);
         }
 
+        grafica->limpiar();     // permite releer el archivo
+
         grafica->addVertices(verticesLeidos);
         grafica->addAristas(aristasLeidas);
 
@@ -343,15 +345,88 @@ void ComplejoSimplicial::comunicarNoConfiableColoreada()
 //    qDebug() << print(grafica->getAristas()).c_str();
 }
 
+void ComplejoSimplicial::comunicarConfiableNoColoreada()
+{
+    std::vector<Edge> aristasGeneradas;
+    std::vector<Vertex3d> verticesGenerados;
+
+    std::vector<Edge> aristas = grafica->getAristas();
+    std::vector<Vertex3d> vertices = grafica->getVertices();
+
+    for (unsigned i = 0; i < aristas.size(); i++) {
+        int index_vertex_1;
+        int index_vertex_2;
+
+        index_vertex_1 = aristas[i].getVertex1();
+        index_vertex_2 = aristas[i].getVertex2();
+
+        std::vector<Vertex3d> result = comunicarDeFormaNoColoreada(vertices[index_vertex_1],
+                                                                   vertices[index_vertex_2]);
+        std::copy(result.begin(), result.end(),
+                  std::back_inserter(verticesGenerados));
+
+        // generar las nuevas aristas
+        // en una comunicacion confiable no coloreada entre dos
+        // procesos no  se generaran nuevas aristas
+    }
+
+    grafica->limpiar();
+    grafica->addVertices(verticesGenerados);
+    grafica->addAristas(aristasGeneradas);
+}
+
+void ComplejoSimplicial::comunicarNoConfiableNoColoreada()
+{
+    std::vector<Edge> aristasGeneradas;
+    std::vector<Vertex3d> verticesGenerados;
+
+    std::vector<Edge> aristas = grafica->getAristas();
+    std::vector<Vertex3d> vertices = grafica->getVertices();
+
+    for (unsigned i = 0; i < aristas.size(); i++) {
+        int index_vertex_1;
+        int index_vertex_2;
+
+        index_vertex_1 = aristas[i].getVertex1();
+        index_vertex_2 = aristas[i].getVertex2();
+
+        std::vector<Vertex3d> result = comunicarDeFormaNoColoreada(vertices[index_vertex_1],
+                                                                   vertices[index_vertex_2]);
+        std::copy(result.begin(), result.end(),
+                  std::back_inserter(verticesGenerados));
+
+        // generar las nuevas aristas
+        // en una comunicacion no segura no coloreada entre dos
+        // procesos se generaran dos aristas nuevas y
+        // tres vertices siempre
+        unsigned NUM_ARISTAS_GENERADAS = 2;
+        std::vector<Vertex3d>::iterator iter = verticesGenerados.end();
+
+        iter--;     // apuntar al ultimo elemento
+
+        for (unsigned i = 0; i < NUM_ARISTAS_GENERADAS; i++) {
+            int indice_actual = iter - verticesGenerados.begin();
+            Edge nueva_arista = Edge(indice_actual - 1, indice_actual);
+            aristasGeneradas.push_back(nueva_arista);
+
+            iter--;
+        }
+    }
+
+    grafica->limpiar();
+    grafica->addVertices(verticesGenerados);
+    grafica->addAristas(aristasGeneradas);
+
+//    qDebug() << "Vertices";
+//    qDebug() << print(grafica->getVertices()).c_str();
+//    qDebug() << "Aristas";
+//    qDebug() << print(grafica->getAristas()).c_str();
+
+}
+
 void ComplejoSimplicial::comunicarProcesos()
 {
     qDebug() << tipoComunicacion.c_str();
-    int num_vertices = grafica->getVertices().size();
-    int num_aristas = grafica->getAristas().size();
-
-    qDebug() << "Numero vertices " << num_vertices;
-    qDebug() << "Numero aristas " << num_aristas;
-
 
     if (tipoComunicacion == STR_CONFIABLE_COLOREADA) {
         comunicarConfiableColoreada();
@@ -361,11 +436,13 @@ void ComplejoSimplicial::comunicarProcesos()
         comunicarNoConfiableColoreada();
     }
 
-    num_vertices = grafica->getVertices().size();
-    num_aristas = grafica->getAristas().size();
+    if (tipoComunicacion == STR_CONFIABLE_NO_COLOREADA) {
+        comunicarConfiableNoColoreada();
+    }
 
-    qDebug() << "Numero vertices despues comunicacion " << num_vertices;
-    qDebug() << "Numero aristas despues comunicacion " << num_aristas;
+    if (tipoComunicacion == STR_NO_CONFIABLE_NO_COLOREADA) {
+        comunicarNoConfiableNoColoreada();
+    }
 
 
     updateGL();

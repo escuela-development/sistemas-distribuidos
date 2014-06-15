@@ -33,6 +33,7 @@ protected:
 
 private:
     void dibujar();
+    void cambiarColor();
     void procesaLineaTexto(std::string cadena);
     Vertex3d leerVertice(std::string cadena);
     Edge leerArista(std::string cadena);
@@ -52,6 +53,7 @@ private:
     int anguloGiroY;
     int anguloGiroX;
 
+    bool bCambiarColor;
     std::string tipoComunicacion;
 };
 

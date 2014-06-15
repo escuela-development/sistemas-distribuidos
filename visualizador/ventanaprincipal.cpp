@@ -68,6 +68,9 @@ void VentanaPrincipal::crearDockWindows()
     dock->setObjectName("communicationDock");
 
     opciones = new OptionsWidget(this);
+    connect(opciones, SIGNAL(setTipoComunicacion(std::string)),
+            simplejo, SLOT(setTipoComunicacion(std::string)));
+
     dock->setWidget(opciones);
     addDockWidget(Qt::RightDockWidgetArea, dock);
 }

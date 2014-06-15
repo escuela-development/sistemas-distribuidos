@@ -28,6 +28,8 @@ ComplejoSimplicial::ComplejoSimplicial(QWidget *parent)
     setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
     setTipoComunicacion(STR_CONFIABLE_COLOREADA);
 
+    bCambiarColor = false;
+
     anguloGiroX = 0;
     anguloGiroY = 0;
 
@@ -45,7 +47,7 @@ ComplejoSimplicial::~ComplejoSimplicial()
 
 void ComplejoSimplicial::initializeGL()
 {
-    qglClearColor(Qt::black);
+    qglClearColor(Qt::gray);
     glShadeModel(GL_FLAT);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -91,10 +93,6 @@ void ComplejoSimplicial::dibujar()
     glRotated(anguloGiroX,1,0,0);
     glRotated(anguloGiroY,0,1,0);
 
-    glColor3f(1, 0, 0);
-
-    // draw graph conntents
-
     glBegin(GL_LINES);
     {
         std::vector<Vertex3d> vertices = grafica->getVertices();
@@ -107,6 +105,8 @@ void ComplejoSimplicial::dibujar()
 
             glVertex3d(v1.getX(), v1.getY(), v1.getZ());
             glVertex3d(v2.getX(), v2.getY(), v2.getZ());
+
+            cambiarColor();
 
         }
     }
@@ -294,12 +294,6 @@ void ComplejoSimplicial::comunicarConfiableColoreada()
     grafica->addVertices(verticesGenerados);
     grafica->addAristas(aristasGeneradas);
 
-    qDebug() << "Vertices";
-    qDebug() << print(grafica->getVertices()).c_str();
-    qDebug() << "Aristas";
-    qDebug() << print(grafica->getAristas()).c_str();
-
-
 }
 
 
@@ -308,7 +302,6 @@ void ComplejoSimplicial::comunicarNoConfiableColoreada()
     std::vector<Edge> aristasGeneradas;
     std::vector<Vertex3d> verticesGenerados;
 
-    std::vector<Edge> iter;
     std::vector<Edge> aristas = grafica->getAristas();
     std::vector<Vertex3d> vertices = grafica->getVertices();
 
@@ -328,21 +321,28 @@ void ComplejoSimplicial::comunicarNoConfiableColoreada()
         // en una comunicacion no segura coloreada entre dos
         // procesos se generaran tres aristas nuevas y
         // cuatro vertices siempre
-        int NUM_VERTICES_GENERADO = result.size();
-        int OFFSET = NUM_VERTICES_GENERADO * i;
+        unsigned NUM_ARISTAS_GENERADAS = 3;
+        std::vector<Vertex3d>::iterator iter = verticesGenerados.end();
 
-        Edge arista_1 = Edge(0 + OFFSET, 1 + OFFSET);
-        Edge arista_2 = Edge(1 + OFFSET, 2 + OFFSET);
-        Edge arista_3 = Edge(2 + OFFSET, 3 + OFFSET);
+        iter--;     // apuntar al ultimo elemento
 
-        aristasGeneradas.push_back(arista_1);
-        aristasGeneradas.push_back(arista_2);
-        aristasGeneradas.push_back(arista_3);
+        for (unsigned i = 0; i < NUM_ARISTAS_GENERADAS; i++) {
+            int indice_actual = iter - verticesGenerados.begin();
+            Edge nueva_arista = Edge(indice_actual - 1, indice_actual);
+            aristasGeneradas.push_back(nueva_arista);
+
+            iter--;
+        }
     }
 
     grafica->limpiar();
     grafica->addVertices(verticesGenerados);
     grafica->addAristas(aristasGeneradas);
+
+    qDebug() << "Vertices";
+    qDebug() << print(grafica->getVertices()).c_str();
+    qDebug() << "Aristas";
+    qDebug() << print(grafica->getAristas()).c_str();
 }
 
 void ComplejoSimplicial::comunicarProcesos()
@@ -362,5 +362,19 @@ void ComplejoSimplicial::comunicarProcesos()
 
 void ComplejoSimplicial::setTipoComunicacion(const std::string tipoComunicacion)
 {
+    qDebug() << tipoComunicacion.c_str();
+
     this->tipoComunicacion = tipoComunicacion;
+}
+
+void ComplejoSimplicial::cambiarColor()
+{
+    if (bCambiarColor) {
+        glColor3f(1, 1, 1);
+    }
+    else {
+        glColor3f(0, 0, 0);
+    }
+
+    bCambiarColor = !bCambiarColor;
 }

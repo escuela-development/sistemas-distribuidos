@@ -42,6 +42,12 @@ void VentanaPrincipal::crearActions()
     stepAction->setStatusTip(tr("Comunicar procesos"));
     connect(stepAction, SIGNAL(triggered()),
             simplejo, SLOT(comunicarProcesos()));
+
+    previousStepAction = new QAction(tr("&PreviousStep"), this);
+    previousStepAction->setIcon(QIcon(tr(":/images/previous-icon-32.png")));
+    previousStepAction->setStatusTip(tr("Generar iteracion anterior"));
+    connect(previousStepAction, SIGNAL(triggered()),
+            simplejo, SLOT(generarIteracionAnterior()));
 }
 
 void VentanaPrincipal::crearMenus()
@@ -55,8 +61,9 @@ void VentanaPrincipal::crearMenus()
 void VentanaPrincipal::crearToolBars()
 {
     animationToolbar = new QToolBar(tr("Animate"));
-    animationToolbar->addAction(stepAction);
-    animationToolbar->setAllowedAreas(Qt::TopToolBarArea);
+    animationToolbar->addAction(previousStepAction);
+    animationToolbar->addAction(stepAction);    
+    animationToolbar->setAllowedAreas(Qt::TopToolBarArea);    
 
     addToolBar(animationToolbar);
 }

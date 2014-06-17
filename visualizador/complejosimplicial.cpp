@@ -11,6 +11,7 @@
 #include <string>
 #include <cstdlib>
 #include <algorithm>
+#include <cmath>
 
 #include <cstdlib>
 #include <cstring>
@@ -25,13 +26,15 @@ ComplejoSimplicial::ComplejoSimplicial(QWidget *parent)
     : QGLWidget(parent)
 {
     setFocusPolicy(Qt::StrongFocus);
-    setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
+//    setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
     setTipoComunicacion(STR_CONFIABLE_COLOREADA);
 
     bCambiarColor = false;
 
+    iteracion = 0;
     anguloGiroX = 0;
     anguloGiroY = 0;
+    factorEscala = 1.0;
 
     QSize size = QSize(500, 500);
     setMinimumSize(size);
@@ -39,6 +42,10 @@ ComplejoSimplicial::ComplejoSimplicial(QWidget *parent)
     grafica = new Grafica;
     graficaOriginal = new Grafica;
     graficaCopia = new Grafica;
+
+    setAutoFillBackground(false);
+    setFormat(QGLFormat(QGL::SampleBuffers));   // support antialiasing
+    crearGradiente();
 }
 
 ComplejoSimplicial::~ComplejoSimplicial()
@@ -46,12 +53,17 @@ ComplejoSimplicial::~ComplejoSimplicial()
     delete grafica;
 }
 
+void ComplejoSimplicial::paintEvent(QPaintEvent *event)
+{
+    dibujar();
+}
+
 void ComplejoSimplicial::initializeGL()
 {
-    qglClearColor(Qt::gray);
-    glShadeModel(GL_FLAT);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+//    qglClearColor(Qt::gray);
+//    glShadeModel(GL_FLAT);
+//    glEnable(GL_DEPTH_TEST);
+//    glEnable(GL_CULL_FACE);
 }
 
 void ComplejoSimplicial::resizeGL(int width, int height)
@@ -68,28 +80,80 @@ void ComplejoSimplicial::resizeGL(int width, int height)
 //    glMatrixMode(GL_MODELVIEW);
 }
 
-void ComplejoSimplicial::paintGL()
-{
-    GLfloat light_pos[] = {10, 20, 0, 0};
+//void ComplejoSimplicial::paintGL()
+//{
+//    GLfloat light_pos[] = {10, 20, 0, 0};
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+////    glLoadIdentity();
+////    gluLookAt(30, -30, 0,
+////              0.0, 0.0, 0,
+////              0.0, 0.0, 1);
+
+//    dibujar();
+
+//}
+
+//void ComplejoSimplicial::dibujar()
+//{
+//    glMatrixMode(GL_MODELVIEW);
+//    glPushMatrix();
 //    glLoadIdentity();
-//    gluLookAt(30, -30, 0,
-//              0.0, 0.0, 0,
-//              0.0, 0.0, 1);
 
-    dibujar();
+//    glRotated(anguloGiroX,1,0,0);
+//    glRotated(anguloGiroY,0,1,0);
 
-}
+//    glBegin(GL_LINES);
+//    {
+//        std::vector<Vertex3d> vertices = grafica->getVertices();
+//        std::vector<Edge> aristas = grafica->getAristas();
+
+//        for (unsigned i = 0; i < aristas.size(); i++) {
+//            Edge a = aristas[i];
+//            Vertex3d v1 = vertices[a.getVertex1()];
+//            Vertex3d v2 = vertices[a.getVertex2()];
+
+//            glVertex3d(v1.getX(), v1.getY(), v1.getZ());
+//            glVertex3d(v2.getX(), v2.getY(), v2.getZ());
+
+//            cambiarColor();
+
+//        }
+//    }
+
+//    glEnd();
+//    glPopMatrix();
+
+//}
 
 void ComplejoSimplicial::dibujar()
 {
+    makeCurrent();
+
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
+
+    glShadeModel(GL_FLAT);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_MULTISAMPLE);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-50, 50, -50, 50, -100, 100);
+    glMatrixMode(GL_MODELVIEW);
+
+    qglClearColor(Qt::gray);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
     glRotated(anguloGiroX,1,0,0);
     glRotated(anguloGiroY,0,1,0);
+
+    glScalef(factorEscala, factorEscala, factorEscala);
+
+    glEnable(GL_MULTISAMPLE);
+    glShadeModel(GL_FLAT);
 
     glBegin(GL_LINES);
     {
@@ -102,25 +166,44 @@ void ComplejoSimplicial::dibujar()
             Vertex3d v2 = vertices[a.getVertex2()];
 
             glVertex3d(v1.getX(), v1.getY(), v1.getZ());
-            glVertex3d(v2.getX(), v2.getY(), v2.getZ());
+            glVertex3d(v2.getX(), v2.getY(), v2.getZ());            
 
             cambiarColor();
 
         }
     }
-
     glEnd();
+
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);    
+
+    glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
+
+    QPainter painter(this);
+    painter.beginNativePainting();
+    renderText(0.0, 0.0, 0.0, QString("Texto prueba"));
+    painter.endNativePainting();
+
+    painter.setRenderHint(QPainter::Antialiasing);
+    dibujarTexto(&painter);
+    painter.end();
 
 }
 
-bool ComplejoSimplicial::leerArchivo(const QString &fileName)
+
+void ComplejoSimplicial::leerArchivo(const QString &fileName)
 {
     std::ifstream file(fileName.toStdString().c_str(), std::ios::in);
     if (!file) {
         std::cerr << "No fue posible leer el archivo " << fileName.toStdString() << std::endl;
-        return false;
+        return;
     }
+
+    anguloGiroX = 0;
+    anguloGiroY = 0;
+    factorEscala = 1.0;
+    iteracion = 0;
 
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -165,9 +248,7 @@ bool ComplejoSimplicial::leerArchivo(const QString &fileName)
     QApplication::restoreOverrideCursor();
 
     // update opengl
-    updateGL();    
-
-    return true;
+    update();
 }
 
 Vertex3d ComplejoSimplicial::leerVertice(std::string cadena)
@@ -228,8 +309,6 @@ void ComplejoSimplicial::incrementarAnguloGiroX(int delta)
 
 void ComplejoSimplicial::keyPressEvent(QKeyEvent *event)
 {
-    qDebug() << "keyPressEvent";
-
     switch (event->key()) {
     case Qt::Key_A:
         incrementarAnguloGiroY(10);
@@ -252,8 +331,17 @@ void ComplejoSimplicial::keyPressEvent(QKeyEvent *event)
         break;
     }
 
-    updateGL();
+    update();
 
+}
+
+void ComplejoSimplicial::wheelEvent(QWheelEvent *event)
+{
+    double numDegrees = event->delta() / 8.0;
+    double numSteps   = numDegrees / 15.0;
+    factorEscala      += numSteps;
+
+    update();
 }
 
 void ComplejoSimplicial::comunicarConfiableColoreada()
@@ -424,10 +512,22 @@ void ComplejoSimplicial::comunicarNoConfiableNoColoreada()
 
 }
 
+/**
+ * This function is called when the user press the "next button" on
+ * the toolbar and cause the application make one round of communication.
+ *
+ * @brief ComplejoSimplicial::comunicarProcesos
+ */
 void ComplejoSimplicial::comunicarProcesos()
 {
-    qDebug() << tipoComunicacion.c_str();
+    generarIteracion();
+    iteracion++;
 
+    update();
+}
+
+void ComplejoSimplicial::generarIteracion()
+{
     if (tipoComunicacion == STR_CONFIABLE_COLOREADA) {
         comunicarConfiableColoreada();
     }
@@ -443,9 +543,6 @@ void ComplejoSimplicial::comunicarProcesos()
     if (tipoComunicacion == STR_NO_CONFIABLE_NO_COLOREADA) {
         comunicarNoConfiableNoColoreada();
     }
-
-
-    updateGL();
 }
 
 void ComplejoSimplicial::setTipoComunicacion(const std::string tipoComunicacion)
@@ -465,4 +562,89 @@ void ComplejoSimplicial::cambiarColor()
     }
 
     bCambiarColor = !bCambiarColor;
+}
+
+void ComplejoSimplicial::crearGradiente()
+{
+    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+    gradient.setCenter(0.45, 0.50);
+    gradient.setFocalPoint(0.40, 0.45);
+    gradient.setColorAt(0.0, QColor(105, 146, 182));
+    gradient.setColorAt(0.4, QColor(81, 113, 150));
+    gradient.setColorAt(0.8, QColor(16, 56, 121));
+}
+
+void ComplejoSimplicial::dibujarFondo(QPainter *painter)
+{
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(gradient);
+    painter->drawRect(rect());
+}
+
+void ComplejoSimplicial::dibujarTexto(QPainter *painter)
+{
+//    const int Margin = 11;
+//    const int Padding = 6;
+
+//    QTextDocument textDocument;
+//    textDocument.setDefaultStyleSheet("* { color: #FFEFEF }");
+//    textDocument.setHtml("Aqui va la descripcion");
+//    textDocument.setTextWidth(textDocument.size().width());
+
+//    QRect rect(QPoint(0, 0), textDocument.size().toSize()
+//               + QSize(2 * Padding, 2 * Padding));
+//    painter->translate(width() - rect.width() - Margin,
+//                       height() - rect.height() - Margin);
+//    painter->setPen(QColor(255, 239, 239));
+//    painter->setBrush(QColor(255, 0, 0, 31));
+//    painter->drawRect(rect);
+
+//    painter->translate(Padding, Padding);
+//    textDocument.drawContents(painter);
+
+    QString text = tr("Click and drag with");
+    QFontMetrics metrics = QFontMetrics(font());
+    int border = qMax(4, metrics.leading());
+
+    QRect rect = metrics.boundingRect(0, 0, width() - 2*border,
+                                      int(height()*0.125),
+                                      Qt::AlignCenter | Qt::TextWordWrap, text);
+    painter->setRenderHint(QPainter::TextAntialiasing);
+    painter->fillRect(QRect(0, 0, width(), rect.height() + 2*border),
+                      QColor(0, 0, 0, 127));
+    painter->setPen(Qt::white);
+    painter->fillRect(QRect(0, 0, width(), rect.height() + 2*border),
+                      QColor(0, 0, 0, 127));
+    painter->drawText((width() - rect.width())/2, border,
+                      rect.width(), rect.height(),
+                      Qt::AlignCenter | Qt::TextWordWrap, text);
+}
+
+void ComplejoSimplicial::showEvent(QShowEvent *event)
+{
+    Q_UNUSED(event);
+}
+
+void ComplejoSimplicial::generarIteracionAnterior()
+{
+    if (iteracion > 0) {
+
+        // generar todas las iteraciones antes de la actual
+        // empezando desde la grafica original
+        int iteraciones_por_realizar = iteracion - 1;
+
+        grafica->limpiar();
+        grafica->addVertices(graficaOriginal->getVertices());
+        grafica->addAristas(graficaOriginal->getAristas());
+
+        qDebug() << "Iteraciones por realizar " << iteraciones_por_realizar;
+        while (iteraciones_por_realizar >= 1) {
+            generarIteracion();
+            iteraciones_por_realizar--;
+        }
+
+        iteracion--;
+
+        update();
+    }
 }

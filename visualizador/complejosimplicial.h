@@ -18,20 +18,28 @@ public:
     ComplejoSimplicial(QWidget *parent = 0);
     ~ComplejoSimplicial();
 
-    bool leerArchivo(const QString &fileName);
+    void leerArchivo(const QString &fileName);
 
 public slots:
 //    void reset();
     void comunicarProcesos();
+    void generarIteracionAnterior();
     void setTipoComunicacion(const std::string tipoComunicacion);
 
 protected:
+    void paintEvent(QPaintEvent *event);
     void initializeGL();
     void resizeGL(int width, int height);
-    void paintGL();
+    void showEvent(QShowEvent *);
+//    void paintGL();
     void keyPressEvent(QKeyEvent * event);
+    void wheelEvent(QWheelEvent *);
 
 private:
+    void crearGradiente();
+    void dibujarFondo(QPainter *painter);
+    void dibujarTexto(QPainter *painter);
+
     void dibujar();
     void cambiarColor();
     void procesaLineaTexto(std::string cadena);
@@ -43,11 +51,12 @@ private:
     void dibujarVertice(Vertex3d vertice);
     void dibujarArista(Edge arista);
 
+    void generarIteracion();
+
     void comunicarConfiableColoreada();
     void comunicarNoConfiableColoreada();
     void comunicarConfiableNoColoreada();
     void comunicarNoConfiableNoColoreada();
-
 
     Grafica *grafica;
     Grafica *graficaOriginal;
@@ -55,9 +64,14 @@ private:
 
     int anguloGiroY;
     int anguloGiroX;
+    double factorEscala;
+    int iteracion;
+    bool seEstaRealizandoAnimacion;
 
     bool bCambiarColor;
     std::string tipoComunicacion;
+
+    QRadialGradient gradient;
 };
 
 #endif // COMPLEJOSIMPLICIAL_H

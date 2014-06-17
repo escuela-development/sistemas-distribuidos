@@ -13,5 +13,6 @@
         <file>images/pause-icon-32.png</file>
         <file>images/play-icon-32.png</file>
         <file>images/stop-icon-32.png</file>
+        <file>images/previous-icon-32.png</file>
     </qresource>
 </RCC>

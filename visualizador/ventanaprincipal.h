@@ -38,6 +38,7 @@ private:
     QAction *openAction;
     QAction *exitAction;
     QAction *stepAction;
+    QAction *previousStepAction;
 };
 
 #endif // VENTANAPRINCIPAL_H

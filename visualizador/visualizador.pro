@@ -7,7 +7,8 @@ HEADERS += \
     edge.h \
     complejosimplicial.h \
     ventanaprincipal.h \
-    mecanismos_comunicacion.h
+    mecanismos_comunicacion.h \
+    triangle.h
 
 SOURCES += \
     vertex2d.cpp \
@@ -19,7 +20,8 @@ SOURCES += \
     complejosimplicial.cpp \
     ventanaprincipal.cpp \
     mecanismos_comunicacion.cpp \
-    Utils.cpp
+    Utils.cpp \
+    triangle.cpp
 
 QT += opengl gui widgets
 

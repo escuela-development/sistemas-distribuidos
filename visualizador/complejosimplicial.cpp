@@ -23,7 +23,9 @@
 #include "Utils.h"
 
 ComplejoSimplicial::ComplejoSimplicial(QWidget *parent)
-    : QGLWidget(parent)
+    : QGLWidget(parent),
+      RADIO_CILINDRO(0.05),
+      RADIO_ESFERA(0.15)
 {
     setFocusPolicy(Qt::StrongFocus);
 //    setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
@@ -61,8 +63,8 @@ void ComplejoSimplicial::paintEvent(QPaintEvent *event)
 void ComplejoSimplicial::initializeGL()
 {
 //    qglClearColor(Qt::gray);
-//    glShadeModel(GL_FLAT);
-//    glEnable(GL_DEPTH_TEST);
+    glShadeModel(GL_FLAT);
+    glEnable(GL_DEPTH_TEST);
 //    glEnable(GL_CULL_FACE);
 }
 
@@ -71,7 +73,8 @@ void ComplejoSimplicial::resizeGL(int width, int height)
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-50, 50, -50, 50, -10, 10);
+    //glOrtho(-50, 50, -50, 50, -10, 10);
+    gluPerspective(60, (GLfloat)width/height, 0.5, 100.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -129,61 +132,135 @@ void ComplejoSimplicial::resizeGL(int width, int height)
 void ComplejoSimplicial::dibujar()
 {
     makeCurrent();
+    GLfloat light_position[] = {10, 20, 0, 0};
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
 
-    glShadeModel(GL_FLAT);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_MULTISAMPLE);
+//    glShadeModel(GL_FLAT);
+//    glEnable(GL_DEPTH_TEST);
+//    glEnable(GL_CULL_FACE);
+//    glEnable(GL_MULTISAMPLE);
 
+//    glMatrixMode(GL_PROJECTION);
+//    glLoadIdentity();
+//    glOrtho(-50, 50, -50, 50, -100, 100);
+//    glMatrixMode(GL_MODELVIEW);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-50, 50, -50, 50, -100, 100);
+    //glOrtho(-50, 50, -50, 50, -10, 10);
+    gluPerspective(60, (GLfloat)width()/height(), 0.5, 100.0);
     glMatrixMode(GL_MODELVIEW);
+//    glLoadIdentity();
 
-    qglClearColor(Qt::gray);
+    glClearColor(0.4, 0.4, 1.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    gluLookAt(0, 20, 0,
+              0, 0, 0,
+              0, 0, 1);
+
+    Vertex3d light = Vertex3d(light_position[0], light_position[1], light_position[2]);
+    dibujarVertice(light);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glPushMatrix();
 
     glRotated(anguloGiroX,1,0,0);
     glRotated(anguloGiroY,0,1,0);
 
     glScalef(factorEscala, factorEscala, factorEscala);
 
-    glEnable(GL_MULTISAMPLE);
-    glShadeModel(GL_FLAT);
+//    glEnable(GL_MULTISAMPLE);
+//    glShadeModel(GL_FLAT);
 
-    glBegin(GL_LINES);
-    {
+//    glBegin(GL_LINES);
+//    {
+//        std::vector<Vertex3d> vertices = grafica->getVertices();
+//        std::vector<Edge> aristas = grafica->getAristas();
+
+//        for (unsigned i = 0; i < aristas.size(); i++) {
+//            Edge a = aristas[i];
+//            Vertex3d v1 = vertices[a.getVertex1()];
+//            Vertex3d v2 = vertices[a.getVertex2()];
+
+//            glVertex3d(v1.getX(), v1.getY(), v1.getZ());
+//            glVertex3d(v2.getX(), v2.getY(), v2.getZ());
+
+//            cambiarColor();
+
+//        }
+//    }
+//    glEnd();
+
+
+//    glBegin(GL_LINES);
+//    {
+//        glLineWidth(10);
+
+//        // x
+//        glColor3f(1, 0, 0);
+//        glVertex3f(0, 0, 0);
+//        glVertex3f(50, 0, 0);
+
+//        // y
+//        glColor3f(0, 1, 0);
+//        glVertex3f(0, 0, 0);
+//        glVertex3f(0, 50, 0);
+
+//        // z
+//        glColor3f(0, 0, 1);
+//        glVertex3d(0, 0, 0);
+//        glVertex3d(0, 0, 50);
+
+//        glLineWidth(1);
+//    }
+//    glEnd();
+
+    std::vector<Vertex3d> vertices = grafica->getVertices();
+    std::vector<Edge> aristas = grafica->getAristas();
+
+    for (unsigned i = 0; i < aristas.size(); i++) {
+        Edge a = aristas[i];
+        Vertex3d v1 = vertices[a.getVertex1()];
+        Vertex3d v2 = vertices[a.getVertex2()];
+
+        dibujarVertice(v1);
+        dibujarVertice(v2);
+
+        glBegin(GL_LINES); {
+            glLineWidth(5);
+
+          glVertex3f(v1.getX(), v1.getY(), v1.getZ());
+          glVertex3f(v2.getX(), v2.getY(), v2.getZ());
+        }
+        glEnd();
+        //dibujarArista(v1, v2);
+    }
+
+    if (tipoComunicacion == STR_CONFIABLE_NO_COLOREADA) {
         std::vector<Vertex3d> vertices = grafica->getVertices();
-        std::vector<Edge> aristas = grafica->getAristas();
 
-        for (unsigned i = 0; i < aristas.size(); i++) {
-            Edge a = aristas[i];
-            Vertex3d v1 = vertices[a.getVertex1()];
-            Vertex3d v2 = vertices[a.getVertex2()];
-
-            glVertex3d(v1.getX(), v1.getY(), v1.getZ());
-            glVertex3d(v2.getX(), v2.getY(), v2.getZ());            
-
-            cambiarColor();
-
+        for (unsigned i = 1; i < vertices.size(); i++) {
+            dibujarVertice(vertices[i]);
         }
     }
-    glEnd();
+    // end miguel
 
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);    
+//    glDisable(GL_CULL_FACE);
+//    glDisable(GL_DEPTH_TEST);
+
+    glPopMatrix();
 
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
 
     QPainter painter(this);
-    painter.beginNativePainting();
-    renderText(0.0, 0.0, 0.0, QString("Texto prueba"));
-    painter.endNativePainting();
+//    painter.beginNativePainting();
+//    renderText(0.0, 0.0, 0.0, QString("Texto prueba"));
+//    painter.endNativePainting();
 
     painter.setRenderHint(QPainter::Antialiasing);
     dibujarTexto(&painter);
@@ -311,19 +388,19 @@ void ComplejoSimplicial::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key()) {
     case Qt::Key_A:
-        incrementarAnguloGiroY(10);
-        break;
-
-    case Qt::Key_D:
         incrementarAnguloGiroY(-10);
         break;
 
+    case Qt::Key_D:
+        incrementarAnguloGiroY(10);
+        break;
+
     case Qt::Key_W:
-        incrementarAnguloGiroX(10);
+        incrementarAnguloGiroX(-10);
         break;
 
     case Qt::Key_S:
-        incrementarAnguloGiroX(-10);
+        incrementarAnguloGiroX(10);
         break;
 
     default:
@@ -450,8 +527,8 @@ void ComplejoSimplicial::comunicarConfiableNoColoreada()
 
         std::vector<Vertex3d> result = comunicarDeFormaNoColoreada(vertices[index_vertex_1],
                                                                    vertices[index_vertex_2]);
-        std::copy(result.begin(), result.end(),
-                  std::back_inserter(verticesGenerados));
+        // solo nos interesa el vertice central
+        verticesGenerados.push_back(result.at(1));
 
         // generar las nuevas aristas
         // en una comunicacion confiable no coloreada entre dos
@@ -647,4 +724,38 @@ void ComplejoSimplicial::generarIteracionAnterior()
 
         update();
     }
+}
+
+void ComplejoSimplicial::dibujarVertice(Vertex3d vertice)
+{
+    float material_difuso[] = {1, 0, 0, 0};
+
+    glPushMatrix();
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, material_difuso);
+    glTranslatef(vertice.getX(), vertice.getY(), vertice.getZ());
+    dibujarEsfera(RADIO_ESFERA, 50, 50);
+    glPopMatrix();
+}
+
+void ComplejoSimplicial::dibujarArista(Vertex3d v1, Vertex3d v2)
+{
+    double w1 = v2.getX() - v1.getX();
+    double w2 = v2.getY() - v1.getY();
+    double w3 = v2.getZ() - v1.getZ();
+
+    double ax1 = -w2;
+    double ax2 = w1;
+    double ax3 = 0;
+
+    double l = sqrt((w1*w1) + (w2*w2) + (w3*w3));
+    double angle = (180.0 * acos(w3/l)) / M_PI;
+
+    float material_difuso[] = {1, 1, 0, 0};
+
+    glPushMatrix();
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, material_difuso);
+    glTranslatef(v1.getX(), v1.getY(), v1.getZ());
+    glRotatef(angle, ax1, ax2, ax3);
+    dibujarCilindro(RADIO_CILINDRO, l, 20, 20);
+    glPopMatrix();
 }

@@ -48,7 +48,6 @@ private:
     void incrementarAnguloGiroY(int delta);
     void incrementarAnguloGiroX(int delta);
 
-    void dibujarVertice(Vertex3d vertice);
     void dibujarArista(Edge arista);
 
     void generarIteracion();
@@ -57,6 +56,9 @@ private:
     void comunicarNoConfiableColoreada();
     void comunicarConfiableNoColoreada();
     void comunicarNoConfiableNoColoreada();
+
+    void dibujarVertice(Vertex3d vertice);
+    void dibujarArista(Vertex3d v1, Vertex3d v2);
 
     Grafica *grafica;
     Grafica *graficaOriginal;
@@ -71,6 +73,8 @@ private:
     bool bCambiarColor;
     std::string tipoComunicacion;
 
+    const double RADIO_CILINDRO;
+    const double RADIO_ESFERA;
     QRadialGradient gradient;
 };
 

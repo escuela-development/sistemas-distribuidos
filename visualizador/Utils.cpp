@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <iterator>
 
+#include "GL/glu.h"
+
 #include "Utils.h"
 #include "vertex2d.h"
 #include "vertex3d.h"
@@ -30,3 +32,12 @@ std::string print(std::vector<Edge> aristas)
     return out.str();
 }
 
+void dibujarCilindro(double radio, double altura, int slices, int stacks)
+{    
+    gluCylinder(gluNewQuadric(), radio, radio, altura, slices, stacks);
+}
+
+void dibujarEsfera(double radio, int slices, int stacks)
+{
+    gluSphere(gluNewQuadric(), radio, slices, stacks);
+}

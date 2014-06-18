@@ -70,64 +70,13 @@ void ComplejoSimplicial::initializeGL()
 
 void ComplejoSimplicial::resizeGL(int width, int height)
 {
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, width, height);    
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //glOrtho(-50, 50, -50, 50, -10, 10);
-    gluPerspective(60, (GLfloat)width/height, 0.5, 100.0);
+    gluPerspective(60, (GLfloat)width/height, 1, 100.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
-//    GLfloat x = GLfloat(width) / height;
-//    gluPerspective(65, x, 1, 20.0);
-//    glMatrixMode(GL_MODELVIEW);
 }
-
-//void ComplejoSimplicial::paintGL()
-//{
-//    GLfloat light_pos[] = {10, 20, 0, 0};
-
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-////    glLoadIdentity();
-////    gluLookAt(30, -30, 0,
-////              0.0, 0.0, 0,
-////              0.0, 0.0, 1);
-
-//    dibujar();
-
-//}
-
-//void ComplejoSimplicial::dibujar()
-//{
-//    glMatrixMode(GL_MODELVIEW);
-//    glPushMatrix();
-//    glLoadIdentity();
-
-//    glRotated(anguloGiroX,1,0,0);
-//    glRotated(anguloGiroY,0,1,0);
-
-//    glBegin(GL_LINES);
-//    {
-//        std::vector<Vertex3d> vertices = grafica->getVertices();
-//        std::vector<Edge> aristas = grafica->getAristas();
-
-//        for (unsigned i = 0; i < aristas.size(); i++) {
-//            Edge a = aristas[i];
-//            Vertex3d v1 = vertices[a.getVertex1()];
-//            Vertex3d v2 = vertices[a.getVertex2()];
-
-//            glVertex3d(v1.getX(), v1.getY(), v1.getZ());
-//            glVertex3d(v2.getX(), v2.getY(), v2.getZ());
-
-//            cambiarColor();
-
-//        }
-//    }
-
-//    glEnd();
-//    glPopMatrix();
-
-//}
 
 void ComplejoSimplicial::dibujar()
 {
@@ -137,41 +86,30 @@ void ComplejoSimplicial::dibujar()
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
 
-//    glShadeModel(GL_FLAT);
-//    glEnable(GL_DEPTH_TEST);
-//    glEnable(GL_CULL_FACE);
-//    glEnable(GL_MULTISAMPLE);
 
 //    glMatrixMode(GL_PROJECTION);
+//    glPushMatrix();
 //    glLoadIdentity();
-//    glOrtho(-50, 50, -50, 50, -100, 100);
-//    glMatrixMode(GL_MODELVIEW);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    //glOrtho(-50, 50, -50, 50, -10, 10);
-    gluPerspective(60, (GLfloat)width()/height(), 0.5, 100.0);
-    glMatrixMode(GL_MODELVIEW);
-//    glLoadIdentity();
+//    gluPerspective(90, (GLfloat)width()/height(), 2, 100.0);
+//    glPopMatrix();
 
     glClearColor(0.4, 0.4, 1.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
-    gluLookAt(0, 20, 0,
+    gluLookAt(0, 0, 20,
               0, 0, 0,
-              0, 0, 1);
+              0, 1, 0);
 
     Vertex3d light = Vertex3d(light_position[0], light_position[1], light_position[2]);
     dibujarVertice(light);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);    
 
-    glPushMatrix();
-
+    glTranslatef(0, 0, -30 + factorEscala);
     glRotated(anguloGiroX,1,0,0);
     glRotated(anguloGiroY,0,1,0);
 
-    glScalef(factorEscala, factorEscala, factorEscala);
 
 //    glEnable(GL_MULTISAMPLE);
 //    glShadeModel(GL_FLAT);
@@ -254,14 +192,8 @@ void ComplejoSimplicial::dibujar()
 
     glPopMatrix();
 
-    glMatrixMode(GL_MODELVIEW);
-    glPopMatrix();
 
     QPainter painter(this);
-//    painter.beginNativePainting();
-//    renderText(0.0, 0.0, 0.0, QString("Texto prueba"));
-//    painter.endNativePainting();
-
     painter.setRenderHint(QPainter::Antialiasing);
     dibujarTexto(&painter);
     painter.end();
@@ -504,10 +436,6 @@ void ComplejoSimplicial::comunicarNoConfiableColoreada()
     grafica->addVertices(verticesGenerados);
     grafica->addAristas(aristasGeneradas);
 
-//    qDebug() << "Vertices";
-//    qDebug() << print(grafica->getVertices()).c_str();
-//    qDebug() << "Aristas";
-//    qDebug() << print(grafica->getAristas()).c_str();
 }
 
 void ComplejoSimplicial::comunicarConfiableNoColoreada()
@@ -581,12 +509,6 @@ void ComplejoSimplicial::comunicarNoConfiableNoColoreada()
     grafica->limpiar();
     grafica->addVertices(verticesGenerados);
     grafica->addAristas(aristasGeneradas);
-
-//    qDebug() << "Vertices";
-//    qDebug() << print(grafica->getVertices()).c_str();
-//    qDebug() << "Aristas";
-//    qDebug() << print(grafica->getAristas()).c_str();
-
 }
 
 /**

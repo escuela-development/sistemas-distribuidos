@@ -86,13 +86,6 @@ void ComplejoSimplicial::dibujar()
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
 
-
-//    glMatrixMode(GL_PROJECTION);
-//    glPushMatrix();
-//    glLoadIdentity();
-//    gluPerspective(90, (GLfloat)width()/height(), 2, 100.0);
-//    glPopMatrix();
-
     glClearColor(0.4, 0.4, 1.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -106,56 +99,9 @@ void ComplejoSimplicial::dibujar()
     dibujarVertice(light);
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);    
 
-    glTranslatef(0, 0, -30 + factorEscala);
+    glTranslatef(0, 0, -15 + factorEscala);
     glRotated(anguloGiroX,1,0,0);
     glRotated(anguloGiroY,0,1,0);
-
-
-//    glEnable(GL_MULTISAMPLE);
-//    glShadeModel(GL_FLAT);
-
-//    glBegin(GL_LINES);
-//    {
-//        std::vector<Vertex3d> vertices = grafica->getVertices();
-//        std::vector<Edge> aristas = grafica->getAristas();
-
-//        for (unsigned i = 0; i < aristas.size(); i++) {
-//            Edge a = aristas[i];
-//            Vertex3d v1 = vertices[a.getVertex1()];
-//            Vertex3d v2 = vertices[a.getVertex2()];
-
-//            glVertex3d(v1.getX(), v1.getY(), v1.getZ());
-//            glVertex3d(v2.getX(), v2.getY(), v2.getZ());
-
-//            cambiarColor();
-
-//        }
-//    }
-//    glEnd();
-
-
-//    glBegin(GL_LINES);
-//    {
-//        glLineWidth(10);
-
-//        // x
-//        glColor3f(1, 0, 0);
-//        glVertex3f(0, 0, 0);
-//        glVertex3f(50, 0, 0);
-
-//        // y
-//        glColor3f(0, 1, 0);
-//        glVertex3f(0, 0, 0);
-//        glVertex3f(0, 50, 0);
-
-//        // z
-//        glColor3f(0, 0, 1);
-//        glVertex3d(0, 0, 0);
-//        glVertex3d(0, 0, 50);
-
-//        glLineWidth(1);
-//    }
-//    glEnd();
 
     std::vector<Vertex3d> vertices = grafica->getVertices();
     std::vector<Edge> aristas = grafica->getAristas();
@@ -165,8 +111,10 @@ void ComplejoSimplicial::dibujar()
         Vertex3d v1 = vertices[a.getVertex1()];
         Vertex3d v2 = vertices[a.getVertex2()];
 
-        dibujarVertice(v1);
-        dibujarVertice(v2);
+        if (grafica->getTriangulos().size() == 0) {
+            dibujarVertice(v1);
+            dibujarVertice(v2);
+        }
 
         glBegin(GL_LINES); {
             glLineWidth(5);
@@ -185,6 +133,31 @@ void ComplejoSimplicial::dibujar()
             dibujarVertice(vertices[i]);
         }
     }
+
+    std::vector<Triangle> triangulos = grafica->getTriangulos();
+    qDebug() << "Numero triangulos " << triangulos.size();
+    for (unsigned i = 0; i < triangulos.size(); i++) {
+
+        std::vector<Vertex3d> v = triangulos[i].getVertices();
+        std::vector<Edge> e = triangulos[i].getAristas();
+
+        for (unsigned i = 0; i < e.size(); i++) {
+            glBegin(GL_LINES);
+            {
+                Vertex3d v1 = v[e[i].getVertex1()];
+                Vertex3d v2 = v[e[i].getVertex2()];
+
+                //dibujarVertice(v1);
+                glVertex3d(v1.getX(), v1.getY(), v1.getZ());
+
+                //dibujarVertice(v2);
+                glVertex3d(v2.getX(), v2.getY(), v2.getZ());
+            }
+            glEnd();
+        }
+    }
+
+
     // end miguel
 
 //    glDisable(GL_CULL_FACE);
@@ -192,12 +165,10 @@ void ComplejoSimplicial::dibujar()
 
     glPopMatrix();
 
-
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     dibujarTexto(&painter);
     painter.end();
-
 }
 
 
@@ -219,40 +190,57 @@ void ComplejoSimplicial::leerArchivo(const QString &fileName)
 
     int numero_vertices;
     int numero_aristas;
+    int numero_triangulos;
+
     std::string line;
+    std::vector<Vertex3d> verticesLeidos;
+    std::vector<Edge> aristasLeidas;
+    std::vector<Triangle> triangulosLeidos;
 
     while(std::getline(file, line)) {
 
         std::istringstream iss_num_vertices(line);
         iss_num_vertices >> numero_vertices;
 
-        std::vector<Vertex3d> verticesLeidos;
+
         for (int i = 0; i < numero_vertices; i++) {
             std::getline(file, line);
             Vertex3d v = leerVertice(line);
             verticesLeidos.push_back(v);
         }
 
+
         std::getline(file, line);
         std::istringstream iss_num_edges(line);
-        iss_num_edges >> numero_aristas;
+        iss_num_edges >> numero_aristas;        
 
-        std::vector<Edge> aristasLeidas;
         for (int i = 0; i < numero_aristas; i++) {
             std::getline(file, line);
             Edge a = leerArista(line);
             aristasLeidas.push_back(a);
         }
 
-        grafica->limpiar();     // permite releer el archivo
+        std::getline(file, line);
+        std::istringstream iss_num_triangles(line);
+        iss_num_triangles >> numero_triangulos;
 
-        grafica->addVertices(verticesLeidos);
-        grafica->addAristas(aristasLeidas);
-
-        // guardar una copia de la grafica original
-        graficaOriginal->addVertices(verticesLeidos);
-        graficaOriginal->addAristas(aristasLeidas);
+        for (int i = 0; i < numero_triangulos; i++) {
+            std::getline(file, line);
+            Triangle t = leerTriangulo(line, verticesLeidos);
+            triangulosLeidos.push_back(t);
+        }
     }
+
+    grafica->limpiar();     // permite releer el archivo
+
+    grafica->addVertices(verticesLeidos);
+    grafica->addAristas(aristasLeidas);
+    grafica->addTriangulos(triangulosLeidos);
+
+    // guardar una copia de la grafica original
+    graficaOriginal->addVertices(verticesLeidos);
+    graficaOriginal->addAristas(aristasLeidas);
+    graficaOriginal->addTriangulos(triangulosLeidos);
 
     QApplication::restoreOverrideCursor();
 
@@ -287,16 +275,40 @@ Edge ComplejoSimplicial::leerArista(std::string cadena)
     strcpy(ptrCadena, cadena.c_str());
 
     int contador = 0;
-    double valores[2];
+    double valores[3];
 
-    char *ptrToken = strtok(ptrCadena, ",");
+    char *ptrToken = strtok(ptrCadena, " (),");
     while (ptrToken != NULL) {
         valores[contador++] = atof(ptrToken);
         ptrToken = strtok(NULL, ",");
     }
 
-    Edge edge = Edge(valores[0], valores[1]);
+    Edge edge = Edge(valores[1], valores[2]);
     return edge;
+}
+
+Triangle ComplejoSimplicial::leerTriangulo(
+        std::string cadena, std::vector<Vertex3d> vertices)
+{
+    char *ptrCadena = new char[cadena.size() + 1];
+    strcpy(ptrCadena, cadena.c_str());
+
+    int contador = 0;
+    int valores[4];
+
+    char *ptrToken = strtok(ptrCadena, " (),");
+    while (ptrToken != NULL) {
+        valores[contador++] = atoi(ptrToken);
+        ptrToken = strtok(NULL, ",");
+    }
+
+    Triangle triangle = Triangle(
+                vertices[valores[1]],
+                vertices[valores[2]],
+                vertices[valores[3]]);
+    return triangle;
+
+
 }
 
 
@@ -472,6 +484,7 @@ void ComplejoSimplicial::comunicarNoConfiableNoColoreada()
 {
     std::vector<Edge> aristasGeneradas;
     std::vector<Vertex3d> verticesGenerados;
+    std::vector<Triangle> triangulosGenerados;
 
     std::vector<Edge> aristas = grafica->getAristas();
     std::vector<Vertex3d> vertices = grafica->getVertices();
@@ -506,9 +519,19 @@ void ComplejoSimplicial::comunicarNoConfiableNoColoreada()
         }
     }
 
+    std::vector<Triangle> triangulos = grafica->getTriangulos();
+    for (unsigned i = 0; i < triangulos.size(); i++) {
+        std::vector<Triangle> result = comunicar(NO_CONFIABLE_NO_COLOREADA, triangulos[i]);
+        std::copy(result.begin(), result.end(),
+                  std::back_inserter(triangulosGenerados));
+    }
+
+    qDebug() << "Numero triangulos generados " << triangulosGenerados.size();
+
     grafica->limpiar();
     grafica->addVertices(verticesGenerados);
     grafica->addAristas(aristasGeneradas);
+    grafica->addTriangulos(triangulosGenerados);
 }
 
 /**
@@ -601,7 +624,7 @@ void ComplejoSimplicial::dibujarTexto(QPainter *painter)
 //    painter->translate(Padding, Padding);
 //    textDocument.drawContents(painter);
 
-    QString text = tr("Click and drag with");
+    QString text = QString(getTituloAplicacion(tipoComunicacion, iteracion).c_str());
     QFontMetrics metrics = QFontMetrics(font());
     int border = qMax(4, metrics.leading());
 
@@ -635,6 +658,7 @@ void ComplejoSimplicial::generarIteracionAnterior()
         grafica->limpiar();
         grafica->addVertices(graficaOriginal->getVertices());
         grafica->addAristas(graficaOriginal->getAristas());
+        grafica->addTriangulos(graficaOriginal->getTriangulos());
 
         qDebug() << "Iteraciones por realizar " << iteraciones_por_realizar;
         while (iteraciones_por_realizar >= 1) {

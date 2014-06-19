@@ -9,6 +9,7 @@
 #include "vertex2d.h"
 #include "vertex3d.h"
 #include "edge.h"
+#include "mecanismos_comunicacion.h"
 
 bool predicateCompareVertex2d(Vertex2d first, Vertex2d second)
 {
@@ -40,4 +41,28 @@ void dibujarCilindro(double radio, double altura, int slices, int stacks)
 void dibujarEsfera(double radio, int slices, int stacks)
 {
     gluSphere(gluNewQuadric(), radio, slices, stacks);
+}
+
+std::string getTituloAplicacion(std::string tipoComunicacion, int iteracion)
+{
+    std::stringstream stream;
+
+    if (tipoComunicacion == STR_CONFIABLE_COLOREADA) {
+        stream << "Tipo de comunicacion confiable coloreada"
+               << "\n" << iteracion;
+    }
+    if (tipoComunicacion == STR_NO_CONFIABLE_COLOREADA) {
+        stream << "Tipo de comunicacion no confiable coloreada"
+               << "\n" << iteracion;
+    }
+    if (tipoComunicacion == STR_CONFIABLE_NO_COLOREADA) {
+        stream << "Tipo de comunicacion confiable no coloreada"
+               << "\n" << iteracion;
+    }
+    if (tipoComunicacion == STR_NO_CONFIABLE_NO_COLOREADA) {
+        stream << "Tipo de comunicacion no confiable no coloreada"
+               << "\n" << iteracion;
+    }
+
+    return stream.str();
 }

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <algorithm>
 #include <iterator>
+#include <string>
 
 #include "GL/glu.h"
 
@@ -12,6 +13,7 @@
 #include "vertex3d.h"
 #include "edge.h"
 
+std::string getTituloAplicacion(std::string tipoComunicacion, int iteracion);
 bool predicateCompareVertex2d(Vertex2d first, Vertex2d second);
 std::string print(std::vector<Vertex3d> vertices);
 std::string print(std::vector<Edge> aristas);

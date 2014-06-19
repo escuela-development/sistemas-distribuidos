@@ -20,6 +20,12 @@ void Grafica::addAristas(std::vector<Edge> aristas)
               std::back_inserter(_aristas));
 }
 
+void Grafica::addTriangulos(std::vector<Triangle> triangulos)
+{
+    std::copy(triangulos.begin(), triangulos.end(),
+              std::back_inserter(_triangulos));
+}
+
 std::vector<Vertex3d> Grafica::getVertices()
 {
     return _vertices;
@@ -30,8 +36,14 @@ std::vector<Edge> Grafica::getAristas()
     return _aristas;
 }
 
+std::vector<Triangle> Grafica::getTriangulos()
+{
+    return _triangulos;
+}
+
 void Grafica::limpiar()
 {
     _vertices.clear();
     _aristas.clear();
+    _triangulos.clear();
 }

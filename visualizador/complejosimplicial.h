@@ -8,6 +8,7 @@
 #include "grafica.h"
 #include "vertex3d.h"
 #include "edge.h"
+#include "triangle.h"
 
 
 class ComplejoSimplicial : public QGLWidget
@@ -45,6 +46,9 @@ private:
     void procesaLineaTexto(std::string cadena);
     Vertex3d leerVertice(std::string cadena);
     Edge leerArista(std::string cadena);
+    Triangle leerTriangulo(std::string cadena, std::vector<Vertex3d> vertices);
+
+
     void incrementarAnguloGiroY(int delta);
     void incrementarAnguloGiroX(int delta);
 
